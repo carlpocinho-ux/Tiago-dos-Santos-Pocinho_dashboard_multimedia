@@ -1,4 +1,4 @@
-# Projeto1_Multimedia_Tiago Pocinho_2026
+# Projeto1_Multimédia_Tiago Pocinho_2026
 Projeto Multimédia de Programação com Inteligência Artificial
 
 Nome do autor;
