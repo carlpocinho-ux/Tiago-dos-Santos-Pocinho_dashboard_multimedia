@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oficina Multimédia · Dashboard de Ferramentas com IA</title>
+<meta name="description" content="Dashboard web multimédia: nuvem de palavras, validador de resoluções e quiz.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<style>
+:root{--bg:#060913;--card:rgba(15,22,41,.72);--line:rgba(120,160,255,.22);--tx:#e6ecff;--mu:#93a0c4;--c1:#22d3ee;--c2:#a78bfa;--c3:#f472b6;--ok:#34d399;--er:#fb7185}
+*{box-sizing:border-box}
+body{margin:0;font:400 1rem/1.55 Inter,system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh}
+#bg{position:fixed;inset:0;z-index:-2;width:100%;height:100%}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/48px 48px;opacity:.22;mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;margin:0}
+.ic{width:1.3em;height:1.3em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.25em}
+header{max-width:1100px;margin:0 auto;padding:56px 20px 24px}
+header h1{font-size:clamp(2.2rem,6vw,4.2rem);line-height:1;letter-spacing:-.03em;background:linear-gradient(100deg,var(--c1),var(--c2) 55%,var(--c3));-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{color:var(--mu);max-width:56ch;margin:14px 0 0}
+main{max-width:1100px;margin:0 auto;padding:0 20px 60px}
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:18px}
+.tab{all:unset;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);backdrop-filter:blur(10px);transition:border-color .2s,box-shadow .2s}
+.tab:hover{border-color:var(--c1)}
+.tab:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+.tab[aria-selected=true]{border-color:var(--c1);box-shadow:0 0 0 1px var(--c1),0 0 32px -6px var(--c1)}
+.tab .ic{grid-row:span 2;width:2.2em;height:2.2em;padding:9px;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c2));color:#060913}
+.tab b{font:700 1.05rem "Space Grotesk",sans-serif}
+.tab small{color:var(--mu)}
+.panel{display:none;border:1px solid var(--line);border-radius:18px;background:var(--card);backdrop-filter:blur(12px);padding:22px}
+.panel.on{display:block}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:22px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.88rem;color:var(--mu);margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(6,9,19,.7);color:var(--tx);font:inherit}
+input[type=color]{padding:2px;height:42px;cursor:pointer}
+textarea{min-height:130px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--c1);outline-offset:1px}
+button.b{cursor:pointer;border:0;border-radius:10px;padding:10px 16px;font:600 .92rem Inter,sans-serif;color:#060913;background:linear-gradient(135deg,var(--c1),var(--c2));margin:0 8px 8px 0}
+button.b.g{background:transparent;color:var(--tx);border:1px solid var(--line)}
+button.b:hover{filter:brightness(1.12)}
+button:focus-visible{outline:2px solid var(--c3);outline-offset:2px}
+.box{border:1px solid var(--line);border-radius:12px;padding:14px;background:rgba(6,9,19,.55);margin-bottom:12px}
+.st{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.st span{background:rgba(34,211,238,.1);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.85rem}
+canvas.cv{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);display:block}
+.ok{color:var(--ok)}.er{color:var(--er)}.wa{color:#fbbf24}
+.pal{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.pal button{all:unset;cursor:pointer;text-align:center;font:600 .75rem monospace}
+.pal input{margin-bottom:4px}
+.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin:10px 0 16px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--c1),var(--c3));transition:width 1s linear}
+.q{font:700 1.3rem "Space Grotesk",sans-serif;margin:8px 0 14px}
+.msg{padding:10px 14px;border-radius:10px;background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.4);margin-bottom:12px}
+#grid{overflow-x:auto;padding-bottom:6px}
+.gr{display:grid;grid-template-columns:44px 84px repeat(16,minmax(26px,1fr));gap:4px;align-items:center;margin-bottom:6px;min-width:660px}
+.gn{font-size:.78rem;line-height:1.15}.gn small{font:600 .68rem monospace;color:var(--mu)}
+.pd{all:unset;cursor:pointer;aspect-ratio:1;border-radius:6px;border:1px solid var(--line);background:rgba(6,9,19,.7)}
+.pd.q{border-color:rgba(255,255,255,.4)}
+.pd.on{background:var(--c);box-shadow:0 0 10px var(--c)}
+.pd.cur{box-shadow:0 0 0 2px #fff}.pd.on.cur{box-shadow:0 0 14px var(--c),0 0 0 2px #fff}
+.pd:focus-visible{outline:2px solid var(--c1);outline-offset:1px}
+.k{stroke:rgba(255,255,255,.6);stroke-width:2;cursor:pointer;transition:transform .1s,filter .1s;transform-box:fill-box;transform-origin:center}
+.k.hit{transform:scale(1.1);filter:brightness(1.9) drop-shadow(0 0 10px #fff)}
+footer{text-align:center;color:var(--mu);font-size:.85rem;padding:0 20px 30px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></symbol>
+<symbol id="i-drum" viewBox="0 0 24 24"><ellipse cx="12" cy="9" rx="8" ry="3"/><path d="M4 9v7c0 1.7 3.6 3 8 3s8-1.3 8-3V9M2 3l7 5M22 3l-7 5"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24"><path d="M6 12h4M8 10v4"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><path d="M17.3 5H6.7a4 4 0 0 0-3.9 3.1L2 17a2 2 0 0 0 3.4 1.4L8 16h8l2.6 2.4A2 2 0 0 0 22 17l-.8-8.9A4 4 0 0 0 17.3 5z"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
+</svg>
+
+<header>
+  <h1><svg class="ic" style="-webkit-text-fill-color:var(--c1);color:var(--c1)"><use href="#i-spark"/></svg> Oficina Multimédia</h1>
+  <p>Três ferramentas criadas a partir das minhas fichas de Python e ampliadas com IA: analisar um texto, criar ritmos de bateria e jogar um quiz sobre multimédia e bateria.</p>
+</header>
+
+<main>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-t="0"><svg class="ic"><use href="#i-type"/></svg><b>Analisador semântico</b><small>Nuvem de palavras e sinónimos</small></button>
+    <button class="tab" role="tab" aria-selected="false" data-t="1"><svg class="ic"><use href="#i-drum"/></svg><b>Estúdio de bateria</b><small>Sequenciador, BPM e grooves</small></button>
+    <button class="tab" role="tab" aria-selected="false" data-t="2"><svg class="ic"><use href="#i-game"/></svg><b>Quiz</b><small>Multimédia e bateria, por níveis de dificuldade</small></button>
+  </div>
+
+  <section class="panel on" id="p0">
+    <div class="split">
+      <div>
+        <label for="poema">Escreve ou cola um poema, uma frase ou um texto</label>
+        <textarea id="poema">O mar guarda a luz da noite
+E o vento leva a saudade
+No coração o sonho é mar
+Luz de mar, luz de saudade</textarea>
+        <label for="ft" style="margin-top:10px">Ou carrega um ficheiro .txt (UTF-8)</label><input id="ft" type="file" accept=".txt,text/plain">
+        <div class="row" style="margin-top:12px">
+          <div><label for="maxw">Máx. palavras</label><input id="maxw" type="number" min="1" max="60" value="20"></div>
+          <div><label for="pal">Paleta</label><select id="pal"><option value="neon">Neon</option><option value="viridis">Viridis</option><option value="plasma">Plasma</option><option value="fogo">Fogo</option><option value="custom">Do estúdio de bateria (widget 2)</option></select></div>
+          <div><label for="fmt">Formato</label><select id="fmt"><option value="1600x900">16:9 (1600×900)</option><option value="1080x1080">1:1 (1080×1080)</option><option value="1080x1920">9:16 (1080×1920)</option></select></div>
+          <div><label for="fun">Fundo</label><select id="fun"><option value="#0b1220">Escuro</option><option value="#ffffff">Branco</option></select></div>
+        </div>
+        <label for="stopx">Stopwords extra (separadas por vírgula)</label>
+        <input id="stopx" placeholder="ex.: luz, noite">
+        <div style="margin-top:14px"><button class="b" id="gerar">Gerar nuvem</button><button class="b g" id="png">Guardar PNG</button></div>
+      </div>
+      <div>
+        <div class="st" id="stats"></div>
+        <canvas class="cv" id="cv"></canvas>
+        <div class="box" style="margin-top:12px"><b>Sugestões de sinónimos</b><div id="sin" style="color:var(--mu);margin-top:6px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p1">
+    <p style="color:var(--mu);margin:0 0 14px">Toco bateria desde os 5 anos, por isso criei o meu estúdio: programa o ritmo, ajusta o BPM e escolhe as cores. Também podes tocar com as teclas <b>A S D F J K L Ç</b> ou clicar na bateria.</p>
+    <div class="split">
+      <div>
+        <svg id="kit" viewBox="0 0 400 340" role="img" aria-label="Bateria vista pelo baterista" style="width:100%;height:auto">
+          <g stroke="rgba(255,255,255,.28)" stroke-width="3" fill="none" stroke-linecap="round"><path d="M70 59V300M315 108V300M38 180V300M82 278V315M268 270v36M342 270v36M45 320l25-20 25 20M290 320l25-20 25 20M18 320l20-15 20 15"/></g>
+          <g id="k5" class="k"><path d="M259 200v66a46 13 0 0 0 92 0v-66z"/><ellipse cx="305" cy="200" rx="46" ry="13" fill="#f3efe6"/></g>
+          <g id="k3" class="k"><path d="M101 118v38a34 11 0 0 0 68 0v-38z"/><ellipse cx="135" cy="118" rx="34" ry="11" fill="#f3efe6"/></g>
+          <g id="k4" class="k"><path d="M171 118v38a34 11 0 0 0 68 0v-38z"/><ellipse cx="205" cy="118" rx="34" ry="11" fill="#f3efe6"/></g>
+          <g id="k0" class="k"><ellipse cx="170" cy="225" rx="72" ry="80" fill="#f8f6f0" stroke="currentColor" stroke-width="9"/><path d="M170 266V300" stroke="#9aa3bd" stroke-width="3"/><circle cx="170" cy="262" r="8" fill="#3b3f4d" stroke="none"/><rect x="148" y="300" width="44" height="22" rx="5" fill="#3b3f4d" stroke="none"/></g>
+          <g id="k1" class="k"><path d="M40 232v34a42 12 0 0 0 84 0v-34z"/><ellipse cx="82" cy="232" rx="42" ry="12" fill="#f3efe6"/></g>
+          <g id="k2" class="k"><ellipse cx="38" cy="176" rx="32" ry="6"/><ellipse cx="38" cy="169" rx="32" ry="6"/><ellipse cx="38" cy="167" rx="6" ry="2.2" fill="rgba(255,255,255,.45)" stroke="none"/></g>
+          <g id="k6" class="k"><ellipse cx="70" cy="48" rx="56" ry="11"/><ellipse cx="70" cy="46" rx="10" ry="3.5" fill="rgba(255,255,255,.45)" stroke="none"/></g>
+          <g id="k7" class="k"><ellipse cx="315" cy="96" rx="62" ry="12"/><ellipse cx="315" cy="94" rx="11" ry="3.5" fill="rgba(255,255,255,.45)" stroke="none"/></g>
+        </svg>
+        <small style="color:var(--mu)">Vista do baterista (destro)</small>
+      </div>
+      <div>
+        <div class="row">
+          <div><label for="bpm">Andamento: <span id="bv">100</span> BPM</label><input id="bpm" type="range" min="40" max="220" value="100"></div>
+          <div><label for="est">Estilo</label><select id="est"></select></div>
+          <div><label for="dif">Dificuldade do groove</label><select id="dif"><option value="1">Fácil</option><option value="2">Médio</option><option value="3">Difícil</option></select></div>
+        </div>
+        <button class="b" id="pl">▶ Tocar</button><button class="b g" id="gg">Gerar groove</button><button class="b g" id="lp">Limpar</button>
+        <div class="box" id="info"></div>
+      </div>
+    </div>
+    <label>Sequenciador: clica nos quadrados e escolhe a cor Hex de cada peça</label>
+    <div id="grid"></div>
+  </section>
+
+  <section class="panel" id="p2"><div id="quiz"></div></section>
+</main>
+
+<script type="text/python" id="py-widgets">
+import json
+import math
+import random
+import unicodedata
+from js import document, window, localStorage, setInterval, clearInterval
+from pyodide.ffi import create_proxy
+
+STOPWORDS = set(
+    "a o as os e é de da do das dos em na no nas nos um uma uns umas que se com por "
+    "para pra ao aos à às ou mas como mais já não sim foi ser são era eu tu ele ela "
+    "nós eles elas me te lhe meu teu seu nosso vamos algumas".split()
+)
+
+SINONIMOS = {
+    "amor": ["afeto", "paixão", "ternura"],
+    "luz": ["clarão", "brilho", "fulgor"],
+    "mar": ["oceano", "vaga", "maresia"],
+    "noite": ["escuridão", "breu", "penumbra"],
+    "vida": ["existência", "jornada", "alento"],
+    "tempo": ["instante", "era", "hora"],
+    "sonho": ["devaneio", "fantasia", "utopia"],
+    "coração": ["peito", "alma", "âmago"],
+    "céu": ["firmamento", "abóbada", "azul"],
+    "dor": ["mágoa", "angústia", "pena"],
+    "alma": ["espírito", "essência", "íntimo"],
+    "sol": ["astro-rei", "aurora", "dia"],
+    "lua": ["luar", "astro", "selene"],
+    "vento": ["brisa", "aragem", "sopro"],
+    "saudade": ["nostalgia", "anseio", "falta"],
+}
+
+PALETAS = {
+    "neon": ["#22d3ee", "#a78bfa", "#f472b6", "#fbbf24", "#34d399"],
+    "viridis": ["#fde725", "#5ec962", "#21918c", "#3b528b", "#7e5aa8"],
+    "plasma": ["#f0f921", "#f89540", "#cc4778", "#7e03a8", "#8b7cf6"],
+    "fogo": ["#fff3b0", "#fbbf24", "#fb923c", "#ef4444", "#b91c1c"],
+}
+
+
+def esc(texto):
+    return (
+        str(texto)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
+def gerar_nuvem(*args):
+    txt = document.querySelector("#poema").value
+    extra_raw = document.querySelector("#stopx").value.lower()
+    extra = {p.strip() for p in extra_raw.replace(",", " ").split() if p.strip()}
+
+    versos = [linha for linha in txt.splitlines() if linha.strip()]
+    palavras = []
+    for token in txt.split():
+        limpa = "".join(ch for ch in token.lower() if ch.isalpha() or ch == "-")
+        if limpa:
+            palavras.append(limpa)
+
+    freq = {}
+    for w in palavras:
+        if len(w) > 1 and w not in STOPWORDS and w not in extra:
+            freq[w] = freq.get(w, 0) + 1
+
+    try:
+        max_w = max(1, int(document.querySelector("#maxw").value or 20))
+    except ValueError:
+        max_w = 20
+
+    top = sorted(freq.items(), key=lambda x: x[1], reverse=True)[:max_w]
+
+    document.querySelector("#stats").innerHTML = (
+        f"<span>{len(versos)} linha(s)</span>"
+        f"<span>{len(palavras)} palavra(s)</span>"
+        f"<span>{len(set(palavras))} única(s)</span>"
+    )
+
+    cv = document.querySelector("#cv")
+    ctx = cv.getContext("2d")
+    w_str, h_str = document.querySelector("#fmt").value.split("x")
+    W, H = int(w_str), int(h_str)
+    cv.width = W
+    cv.height = H
+    ctx.fillStyle = document.querySelector("#fun").value
+    ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+
+    if top:
+        pal_nome = document.querySelector("#pal").value
+        cores = cor_pal if pal_nome == "custom" else PALETAS[pal_nome]
+        mx = top[0][1]
+        colocadas = []
+
+        a0 = random.random() * math.pi * 2
+        direcao = 1 if random.random() < 0.5 else -1
+        da = 0.15 + random.random() * 0.08
+        dr = 0.22 + random.random() * 0.1
+
+        for k, (w, n) in enumerate(top):
+            fs = (H * 0.04 + (n / mx) * H * 0.1) * (0.92 + random.random() * 0.16)
+            vert = k > 0 and random.random() < 0.3
+            for _ in range(14):
+                ctx.font = f'700 {fs}px "Space Grotesk",Arial,sans-serif'
+                tw = ctx.measureText(w).width + 14
+                th = fs * 1.15
+                bw = th if vert else tw
+                bh = tw if vert else th
+                ok = None
+                for s in range(2600):
+                    a = a0 + direcao * da * s
+                    r = dr * s
+                    x = W / 2 + math.cos(a) * r * (W / H)
+                    y = H / 2 + math.sin(a) * r
+                    if (
+                        x - bw / 2 > 10
+                        and x + bw / 2 < W - 10
+                        and y - bh / 2 > 10
+                        and y + bh / 2 < H - 10
+                    ):
+                        colide = any(
+                            abs(p[0] - x) < (p[2] + bw) / 2
+                            and abs(p[1] - y) < (p[3] + bh) / 2
+                            for p in colocadas
+                        )
+                        if not colide:
+                            ok = (x, y, bw, bh)
+                            break
+                if ok:
+                    ci = max(
+                        0,
+                        min(
+                            len(cores) - 1,
+                            math.floor((1 - n / mx) * len(cores) + (random.random() - 0.5) * 1.4),
+                        ),
+                    )
+                    ctx.fillStyle = cores[ci]
+                    ctx.save()
+                    ctx.translate(ok[0], ok[1])
+                    if vert:
+                        ctx.rotate(-math.pi / 2)
+                    ctx.fillText(w, 0, 0)
+                    ctx.restore()
+                    colocadas.append(ok)
+                    break
+                fs *= 0.88
+
+    sugestoes = [
+        f'<p style="margin:4px 0"><b style="color:var(--c1)">{esc(w)}</b> → {", ".join(esc(x) for x in SINONIMOS[w])}</p>'
+        for w, _ in top
+        if w in SINONIMOS
+    ]
+    document.querySelector("#sin").innerHTML = (
+        "".join(sugestoes)
+        or "Sem sugestões para estas palavras. Experimenta: mar, luz, noite, sonho, saudade, vento."
+    )
+
+
+NOMES_PECAS = ["Bombo", "Tarola", "Hi-hat", "Tom 1", "Tom 2", "Timbalão", "Crash", "Ride"]
+
+PREDEFINIDOS = {
+    "Rock": [
+        "1000001010000000", "0000100000001000", "1010101010101010", "0000000000000000",
+        "0000000000000000", "0000000000000000", "1000000000000000", "0000000000000000",
+    ],
+    "Funk": [
+        "1000001000110000", "0000100000001001", "1011101110111011", "0000000000000000",
+        "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000",
+    ],
+    "Disco": [
+        "1000100010001000", "0000100000001000", "0010001000100010", "0000000000000000",
+        "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000",
+    ],
+    "Blast beat": [
+        "1010101010101010", "0101010101010101", "1111111111111111", "0000000000000000",
+        "0000000000000000", "0000000000000000", "1000000000000000", "0000000000000000",
+    ],
+    "Rock com Ride": [
+        "1000001010100000", "0000100000001000", "0000000000000000", "0000000000001000",
+        "0000000000000100", "0000000000000011", "1000000000000000", "1010101010101010",
+    ],
+}
+
+cor_pal = ["#EF4444", "#22D3EE", "#FBBF24", "#A78BFA", "#60A5FA", "#FB923C", "#34D399", "#F472B6"]
+
+
+def criar_padrao(estilo):
+    return [[int(ch) for ch in linha] for linha in PREDEFINIDOS[estilo]]
+
+
+pat = criar_padrao("Rock")
+window.sincronizarPadrao(json.dumps(pat))
+
+
+def andamento(bpm):
+    if bpm < 60:
+        return "Largo (muito lento)"
+    elif bpm < 76:
+        return "Adagio (lento)"
+    elif bpm < 108:
+        return "Andante (moderado)"
+    elif bpm < 120:
+        return "Moderato"
+    elif bpm < 168:
+        return "Allegro (rápido)"
+    else:
+        return "Presto (muito rápido)"
+
+
+def atualizar_info(*args):
+    b = int(document.querySelector("#bpm").value)
+    contagens = [sum(linha) for linha in pat]
+    total = sum(contagens)
+    dens = round(total / 128 * 100)
+    sinc = sum(1 for r in (0, 1) for i, v in enumerate(pat[r]) if v and i % 4 != 0)
+    if b > 160 or dens > 50 or sinc > 5:
+        dif = "Difícil"
+    elif dens > 30 or sinc > 2:
+        dif = "Médio"
+    else:
+        dif = "Fácil"
+
+    document.querySelector("#bv").textContent = str(b)
+    resumo_pecas = " · ".join(f"{NOMES_PECAS[i]}: {contagens[i]}" for i in range(len(NOMES_PECAS)))
+    document.querySelector("#info").innerHTML = (
+        f'<p style="margin:0 0 6px"><b>{b} BPM</b> · {andamento(b)}</p>'
+        f'<p style="margin:0 0 6px;color:var(--mu)">{resumo_pecas}</p>'
+        f'<p style="margin:0">{total} nota(s) · densidade {dens}% · {sinc} síncopa(s) · dificuldade estimada: <b>{dif}</b></p>'
+    )
+
+
+def pintar_kit():
+    for r, cor in enumerate(cor_pal):
+        k = document.querySelector(f"#k{r}")
+        k.style.fill = cor
+        k.style.color = cor
+
+
+def desenhar_grelha():
+    linhas_html = []
+    for r, nome in enumerate(NOMES_PECAS):
+        botoes = "".join(
+            f'<button class="pd{" on" if v else ""}{"" if c % 4 else " q"}" '
+            f'data-r="{r}" data-c="{c}" style="--c:{cor_pal[r]}" '
+            f'aria-label="{nome}, passo {c + 1}"></button>'
+            for c, v in enumerate(pat[r])
+        )
+        linhas_html.append(
+            f'<div class="gr"><input type="color" value="{cor_pal[r]}" data-r="{r}" aria-label="Cor {nome}">'
+            f'<span class="gn">{nome}<br><small>{cor_pal[r]}</small></span>{botoes}</div>'
+        )
+    document.querySelector("#grid").innerHTML = "".join(linhas_html)
+    pintar_kit()
+    window.sincronizarPadrao(json.dumps(pat))
+
+
+def clique_grelha(e):
+    b = e.target.closest(".pd")
+    if not b:
+        return
+    r = int(b.dataset.r)
+    c = int(b.dataset.c)
+    pat[r][c] ^= 1
+    b.classList.toggle("on")
+    window.sincronizarPadrao(json.dumps(pat))
+    atualizar_info()
+
+
+def mudar_cor(e):
+    if e.target.type != "color":
+        return
+    r = int(e.target.dataset.r)
+    row = e.target.parentNode
+    cor_pal[r] = e.target.value.upper()
+    for p in row.querySelectorAll(".pd"):
+        p.style.setProperty("--c", cor_pal[r])
+    row.querySelector("small").textContent = cor_pal[r]
+    pintar_kit()
+
+
+def mudar_estilo(*args):
+    global pat
+    pat = criar_padrao(document.querySelector("#est").value)
+    desenhar_grelha()
+    atualizar_info()
+
+
+def limpar_grelha(*args):
+    global pat
+    pat = [[0] * 16 for _ in range(8)]
+    desenhar_grelha()
+    atualizar_info()
+
+
+def gerar_groove(*args):
+    global pat
+    d = int(document.querySelector("#dif").value)
+    pat = criar_padrao(document.querySelector("#est").value)
+    for _ in range(d * 2):
+        r = 0 if random.random() < 0.6 else 1
+        pat[r][random.randrange(16)] = 1
+    if d == 3:
+        toms = [3, 3, 4, 5]
+        for idx, p in enumerate(range(12, 16)):
+            pat[toms[idx]][p] = 1 if random.random() < 0.75 else 0
+    desenhar_grelha()
+    atualizar_info()
+
+
+QS = [
+    (1, "Que modelo de cor usam os ecrãs? (sigla)", ["rgb"]),
+    (1, "Que modelo de cor se usa na impressão? (sigla)", ["cmyk"]),
+    (1, "Qual o formato de imagem vetorial da web? (sigla)", ["svg"]),
+    (1, "Que linguagem estiliza as páginas web? (sigla)", ["css"]),
+    (1, "Como se chama cada ponto de cor de um ecrã?", ["pixel"]),
+    (2, "Quantas imagens por segundo (fps) tem o cinema tradicional?", ["24"]),
+    (2, "Qual o formato de imagem comprimido mais usado em fotografias? (sigla)", ["jpg", "jpeg"]),
+    (2, "Qual o formato de imagem sem perdas que suporta transparência? (sigla)", ["png"]),
+    (2, "Qual o rácio de ecrã do Full HD?", ["16:9", "16/9"]),
+    (2, "Qual o código hexadecimal do branco? (3 ou 6 dígitos)", ["ffffff", "fff"]),
+    (3, "Quantos píxeis de largura tem o 4K UHD?", ["3840"]),
+    (3, "Que codec de vídeo é o mais comum nos MP4? (H.264 ou AVC)", ["h.264", "h264", "avc"]),
+    (3, "Que formato de áudio sem compressão é muito usado no Windows? (sigla)", ["wav"]),
+    (3, "Qual o espaço de cor padrão da web? (sigla)", ["srgb"]),
+    (3, "Qual a extensão dos ficheiros nativos do Photoshop?", ["psd"]),
+    (1, "Qual a peça da bateria tocada com pedal que dá o som mais grave?", ["bombo", "bumbo"]),
+    (1, "Como se chama o par de pratos que fecha com um pedal?", ["hi-hat", "hihat", "charleston", "charles", "chimbal"]),
+    (2, "Quantos tempos tem cada compasso 4/4?", ["4", "quatro"]),
+    (2, "Que unidade (sigla) mede o andamento de uma música?", ["bpm"]),
+    (2, "Como se chama o tambor grande que fica no chão, ao lado da bateria?", ["timbalão", "tom de chão"]),
+    (3, "Como se chama o andamento muito rápido, acima de 168 BPM?", ["presto"]),
+    (3, "Como se chamam, em inglês, as notas muito suaves tocadas entre as principais na caixa?", ["ghost notes", "ghost note"]),
+]
+
+TEMPO_NIVEL = {"1": 20, "2": 15, "3": 12, "m": 15}
+estado_quiz = None
+try:
+    best_score = int(localStorage.getItem("quizBest") or 0)
+except Exception:
+    best_score = 0
+
+
+def norm(texto):
+    sem_acentos = "".join(
+        ch for ch in unicodedata.normalize("NFD", str(texto).lower()) if unicodedata.category(ch) != "Mn"
+    )
+    return "".join(ch for ch in sem_acentos if ch not in {"#", " ", "\t", "\n"})
+
+
+def dica_auto(q, tentativa):
+    alvo = q[2][0]
+    t_limpa = tentativa.strip()
+    if alvo.isdigit() and t_limpa.isdigit():
+        rel = "maior" if int(t_limpa) > int(alvo) else "menor"
+        return f"o teu número é {rel} do que a resposta."
+    if alvo.isdigit():
+        return f"a resposta é um número com {len(alvo)} algarismos."
+    return f'a resposta começa por "{alvo[0].upper()}" e tem {len(alvo)} caracteres.'
+
+
+def quiz_inicio(*args):
+    global estado_quiz
+    if estado_quiz and estado_quiz.get("id") is not None:
+        clearInterval(estado_quiz["id"])
+    estado_quiz = None
+    document.querySelector("#quiz").innerHTML = (
+        '<div class="row" style="align-items:end">'
+        '<div><label for="nv">Nível de dificuldade</label>'
+        '<select id="nv"><option value="1">Fácil</option><option value="2">Médio</option>'
+        '<option value="3">Difícil</option><option value="m">Misto (8 perguntas de todos os níveis)</option></select></div>'
+        '<div><button class="b" id="go">Começar quiz</button></div></div>'
+        f'<p style="color:var(--mu)">Perguntas de multimédia e bateria, com cronómetro e uma dica por pergunta (custa meio ponto). '
+        f'Se errares, recebes uma dica automática e uma segunda tentativa. Melhor pontuação: <b>{best_score}%</b></p>'
+    )
+    document.querySelector("#go").onclick = create_proxy(comecar_quiz)
+
+
+def comecar_quiz(*args):
+    global estado_quiz
+    n = document.querySelector("#nv").value
+    pool = list(QS) if n == "m" else [q for q in QS if str(q[0]) == n]
+    random.shuffle(pool)
+    if n == "m":
+        pool = pool[:8]
+    estado_quiz = {
+        "n": n, "l": pool, "i": 0, "pts": 0.0,
+        "seq": 0, "err": 0, "dica": False, "msg": "", "id": None
+    }
+    quiz_pergunta()
+
+
+def tick_quiz():
+    if not estado_quiz:
+        return
+    estado_quiz["t"] -= 1
+    tm = document.querySelector("#tm")
+    if tm:
+        tm.textContent = f'{estado_quiz["t"]}s'
+    if estado_quiz["t"] <= 0:
+        rs = document.querySelector("#rs")
+        quiz_responder(rs.value if rs else "", True)
+
+
+def quiz_pergunta():
+    if estado_quiz["i"] >= len(estado_quiz["l"]):
+        quiz_fim()
+        return
+    q = estado_quiz["l"][estado_quiz["i"]]
+    estado_quiz["t"] = TEMPO_NIVEL[estado_quiz["n"]]
+    estado_quiz["dica"] = False
+    estado_quiz["tent"] = 0
+
+    aviso = f'<div class="msg" role="status">{estado_quiz["msg"]}</div>' if estado_quiz["msg"] else ""
+    document.querySelector("#quiz").innerHTML = (
+        f'{aviso}<div class="st"><span>Pergunta {estado_quiz["i"] + 1}/{len(estado_quiz["l"])}</span>'
+        f'<span>🔥 Sequência {estado_quiz["seq"]}</span><span id="tm">{estado_quiz["t"]}s</span></div>'
+        f'<div class="bar"><i id="br" style="width:100%"></i></div>'
+        f'<div class="q">{esc(q[1])}</div>'
+        f'<form id="fq"><input id="rs" autocomplete="off" aria-label="Resposta">'
+        f'<div id="dc" style="color:var(--c2);margin:8px 0"></div>'
+        f'<button class="b">Responder</button>'
+        f'<button type="button" class="b g" id="dk">Pedir dica</button></form>'
+    )
+    rs = document.querySelector("#rs")
+    rs.focus()
+    br = document.querySelector("#br")
+    window.requestAnimationFrame(create_proxy(lambda *_: setattr(br.style, "width", "0%")))
+    br.style.transitionDuration = f'{estado_quiz["t"]}s'
+
+    def pedir_dica(*_):
+        estado_quiz["dica"] = True
+        document.querySelector("#dc").textContent = "Dica: " + dica_auto(q, "")
+
+    def submeter(e):
+        e.preventDefault()
+        quiz_responder(document.querySelector("#rs").value, False)
+
+    document.querySelector("#dk").onclick = create_proxy(pedir_dica)
+    document.querySelector("#fq").onsubmit = create_proxy(submeter)
+    estado_quiz["id"] = setInterval(create_proxy(tick_quiz), 1000)
+
+
+def quiz_responder(r, tempo):
+    q = estado_quiz["l"][estado_quiz["i"]]
+    ok = (not tempo) and any(norm(a) == norm(r) for a in q[2])
+    if (not ok) and (not tempo) and estado_quiz["tent"] == 0:
+        estado_quiz["tent"] = 1
+        estado_quiz["dica"] = True
+        document.querySelector("#dc").textContent = (
+            "❌ Ainda não. Dica automática: " + dica_auto(q, r) + " Tens mais uma tentativa."
+        )
+        rs = document.querySelector("#rs")
+        rs.value = ""
+        rs.focus()
+        return
+
+    clearInterval(estado_quiz["id"])
+    estado_quiz["id"] = None
+    if ok:
+        estado_quiz["pts"] += 0.5 if estado_quiz["dica"] else 1.0
+        estado_quiz["seq"] += 1
+        estado_quiz["err"] = 0
+        if estado_quiz["seq"] >= 3:
+            estado_quiz["msg"] = f'🔥 Sequência de {estado_quiz["seq"]}! Estás imparável.'
+        elif estado_quiz["dica"]:
+            estado_quiz["msg"] = "✅ Certo, com ajuda da dica. Tenta a próxima sem ela!"
+        else:
+            estado_quiz["msg"] = "✅ Certo! Continua assim."
+    else:
+        estado_quiz["seq"] = 0
+        estado_quiz["err"] += 1
+        pre = "⏱ Tempo esgotado." if tempo else "❌ Errado."
+        extra = (
+            f'Já são {estado_quiz["err"]} seguidas: respira e usa a dica na próxima.'
+            if estado_quiz["err"] >= 2
+            else "Não faz mal, é assim que se aprende."
+        )
+        estado_quiz["msg"] = f'{pre} A resposta era <b>{esc(q[2][0].upper())}</b>. {extra}'
+
+    estado_quiz["i"] += 1
+    quiz_pergunta()
+
+
+def quiz_fim():
+    global best_score
+    total = len(estado_quiz["l"])
+    pts_fmt = int(estado_quiz["pts"]) if estado_quiz["pts"].is_integer() else estado_quiz["pts"]
+    p = round(estado_quiz["pts"] / total * 100)
+    novo = p > best_score
+    if novo:
+        best_score = p
+        try:
+            localStorage.setItem("quizBest", str(p))
+        except Exception:
+            pass
+    msg_final = (
+        "Nível de designer sénior! 🏆"
+        if p >= 80
+        else ("Bom trabalho, já dominas a base. 👍" if p >= 50 else "Tens margem para crescer. Tenta outra vez! 💪")
+    )
+    recorde_html = '<p class="ok">Novo recorde pessoal!</p>' if novo else f'<p style="color:var(--mu)">Recorde: {best_score}%</p>'
+    document.querySelector("#quiz").innerHTML = (
+        f'<div class="box"><div class="q">{pts_fmt} de {total} pontos · {p}%</div>'
+        f'<p>{msg_final}</p>{recorde_html}</div>'
+        '<button class="b" id="again">Jogar novamente</button>'
+    )
+    document.querySelector("#again").onclick = create_proxy(quiz_inicio)
+
+
+document.querySelector("#est").innerHTML = "".join(f"<option>{k}</option>" for k in PREDEFINIDOS)
+document.querySelector("#gerar").onclick = create_proxy(gerar_nuvem)
+document.querySelector("#grid").onclick = create_proxy(clique_grelha)
+document.querySelector("#grid").oninput = create_proxy(mudar_cor)
+document.querySelector("#est").onchange = create_proxy(mudar_estilo)
+document.querySelector("#bpm").oninput = create_proxy(atualizar_info)
+document.querySelector("#lp").onclick = create_proxy(limpar_grelha)
+document.querySelector("#gg").onclick = create_proxy(gerar_groove)
+
+desenhar_grelha()
+atualizar_info()
+gerar_nuvem()
+quiz_inicio()
+</script>
+
+<script>
+const $=s=>document.querySelector(s);
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let pat=Array.from({length:8},()=>Array(16).fill(0));
+window.sincronizarPadrao=json=>{pat=JSON.parse(json)};
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  if(tocar)toggle();
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
+  document.querySelectorAll(".panel").forEach((p,i)=>p.classList.toggle("on",i==t.dataset.t));
+});
+
+let beat=0;
+(function(){
+  const c=$("#bg"),x=c.getContext("2d");let W,H,N=[],m={x:-999,y:-999};
+  const size=()=>{W=c.width=innerWidth;H=c.height=innerHeight;N=Array.from({length:Math.min(90,W/16|0)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35}))};
+  addEventListener("resize",size);addEventListener("pointermove",e=>{m.x=e.clientX;m.y=e.clientY});size();
+  function f(){
+    x.clearRect(0,0,W,H);beat*=.9;
+    const g=x.createRadialGradient(W*.8,0,0,W*.8,0,W*.7);g.addColorStop(0,`rgba(167,139,250,${.18+beat*.3})`);g.addColorStop(1,"transparent");x.fillStyle=g;x.fillRect(0,0,W,H);
+    N.forEach((a,i)=>{
+      if(!RM){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1}
+      x.fillStyle="#22d3ee";x.fillRect(a.x,a.y,2+beat*3,2+beat*3);
+      for(let j=i+1;j<N.length;j++){const b=N[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d<130){x.strokeStyle=`rgba(34,211,238,${.28*(1-d/130)})`;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}
+      const dm=Math.hypot(a.x-m.x,a.y-m.y);
+      if(dm<170){x.strokeStyle=`rgba(244,114,182,${.6*(1-dm/170)})`;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(m.x,m.y);x.stroke()}
+    });
+    if(!RM)requestAnimationFrame(f);
+  }
+  f();
+})();
+
+$("#ft").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$("#poema").value=r.result;$("#gerar").click()};r.readAsText(f,"UTF-8")};
+$("#png").onclick=()=>{const a=document.createElement("a");a.download="nuvem_de_palavras.png";a.href=$("#cv").toDataURL("image/png");a.click()};
+
+let ctx=null,NB=null,tocar=false,passo=0,prox=0,tid=0;
+function audio(){
+  if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();NB=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  if(ctx.state==="suspended")ctx.resume();
+}
+function ruido(t,f,g,d){const s=ctx.createBufferSource(),h=ctx.createBiquadFilter(),v=ctx.createGain();s.buffer=NB;h.type="highpass";h.frequency.value=f;v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(h);h.connect(v);v.connect(ctx.destination);s.start(t);s.stop(t+d)}
+function tom(t,f1,f2,g,d,w){const o=ctx.createOscillator(),v=ctx.createGain();o.type=w||"sine";o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(v);v.connect(ctx.destination);o.start(t);o.stop(t+d)}
+function metal(t,fr,hp,g,d){const h=ctx.createBiquadFilter(),v=ctx.createGain();h.type="highpass";h.frequency.value=hp;v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.001,t+d);h.connect(v);v.connect(ctx.destination);fr.forEach(f=>{const o=ctx.createOscillator();o.type="square";o.frequency.value=f;o.connect(h);o.start(t);o.stop(t+d)})}
+const HH=[263,400,421,474,587,845],CR=[310,445,530,690,815,1130];
+function som(i,t){[
+  ()=>{tom(t,110,48,1,.45,"triangle");tom(t,55,40,.8,.65);ruido(t,2500,.2,.012)},
+  ()=>{tom(t,200,165,.45,.14,"triangle");ruido(t,2200,.5,.2)},
+  ()=>ruido(t,7000,.3,.05),
+  ()=>{tom(t,215,170,.8,.36);ruido(t,3500,.1,.02)},
+  ()=>{tom(t,160,128,.8,.44);ruido(t,3500,.1,.02)},
+  ()=>{tom(t,135,100,.9,.55);ruido(t,3000,.1,.025)},
+  ()=>{ruido(t,3000,.4,1.5);metal(t,CR,6000,.14,1.3)},
+  ()=>{ruido(t,6000,.14,.03);ruido(t,7500,.11,1.2);[[1180,.06],[1760,.04],[2650,.03]].forEach(([f,g])=>tom(t,f,f*.998,g,.9));metal(t,HH,8500,.1,1.1)}
+][i]()}
+function flash(i){if(i===0)beat=1;const k=$("#k"+i);k.classList.add("hit");setTimeout(()=>k.classList.remove("hit"),110)}
+function marcar(p){document.querySelectorAll(".pd.cur").forEach(x=>x.classList.remove("cur"));if(p>=0)document.querySelectorAll(`.pd[data-c="${p}"]`).forEach(x=>x.classList.add("cur"))}
+function tick(){
+  const bpm=+$("#bpm").value;
+  while(prox<ctx.currentTime+.1){
+    const p=passo,t=prox;
+    pat.forEach((l,r)=>{if(l[p])som(r,t)});
+    setTimeout(()=>{if(!tocar)return;marcar(p);pat.forEach((l,r)=>{if(l[p])flash(r)})},Math.max(0,(t-ctx.currentTime)*1000));
+    prox+=60/bpm/4;passo=(passo+1)%16;
+  }
+  tid=setTimeout(tick,25);
+}
+function toggle(){
+  if(tocar){tocar=false;clearTimeout(tid);$("#pl").textContent="▶ Tocar";marcar(-1);return}
+  audio();tocar=true;passo=0;prox=ctx.currentTime+.05;$("#pl").textContent="■ Parar";tick();
+}
+$("#pl").onclick=toggle;
+$("#kit").onclick=e=>{const k=e.target.closest(".k");if(!k)return;const i=+k.id.slice(1);audio();som(i,ctx.currentTime);flash(i)};
+const TECLAS={a:0,s:1,d:2,f:3,j:4,k:5,l:6,"ç":7,";":7};
+addEventListener("keydown",e=>{
+  if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  const i=TECLAS[e.key.toLowerCase()];if(i===undefined||!$("#p1").classList.contains("on"))return;
+  audio();som(i,ctx.currentTime);flash(i);
+});
+
+(async function(){
+  const pyodide=await loadPyodide();
+  await pyodide.runPythonAsync($("#py-widgets").textContent);
+})();
+</script>
+</body>
+</html>
