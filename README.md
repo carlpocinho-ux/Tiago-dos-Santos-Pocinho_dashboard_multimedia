@@ -1,8 +1,8 @@
 # Tiago dos Santos Pocinho_dashboard_multimedia.
 Projeto Multimédia de Programação com Inteligência Artificial
 
-Nome da Aplicação / Dashboard Web:
-Disciplina: Oficina de Multimédia - 12.o Ano - CRSI
+Nome da Aplicação / Dashboard Web: Github
+Disciplina: Oficina de Multimédia
 Ano Letivo: 2026/2027
 Autor: Tiago dos Santos Pocinho
 Turma: A3
@@ -13,7 +13,7 @@ Descrição: Dashboard web com 3 ferramentas interativas, criadas a partir das m
 Proposta Escolhida: Proposta 1 - Dashboard Web de Ferramentas Multimédia com IA.
 
 2. Estrutura do Código e Funcionalidades Integradas
-Parte dos exercícios foi adaptada das fichas e parte foi criada de raiz com ajuda da IA. A lógica das fichas, escrita em Python, foi convertida para JavaScript, porque o GitHub Pages só publica páginas estáticas (HTML/CSS/JS). Toda a aplicação está num único ficheiro, o index.html.
+Parte dos exercícios foi adaptada das fichas e parte foi criada de raiz com ajuda da IA.
 
 Widget 1 - Analisador semântico (adaptado da Ficha 1):
 •	Origem nas fichas: strings, listas, dicionários e contagem de frequências de palavras; leitura de ficheiros .txt.
@@ -46,7 +46,7 @@ o	estatísticas do ritmo: notas, densidade, síncopas e dificuldade estimada.
 •	Ampliação com IA: gerador de grooves por estilo e dificuldade (fácil, médio, difícil), estimativa da dificuldade, síntese de som com afinação própria para cada peça e desenho da bateria.
 
 Widget 3 - Quiz (adaptado da Ficha 2):
-•	Origem nas fichas: o jogo Quiz (pontuação e percentagem com if / else) e o jogo Adivinha o Número (níveis de dificuldade e dicas "maior" ou "menor").
+•	Origem nas fichas: o jogo Quiz (pontuação e percentagem com if / else) 
 
 •	Funcionalidades:
 o	22 perguntas de multimédia e bateria, em 3 níveis (7 fáceis, 8 médias, 7 difíceis) e um modo misto de 8 perguntas;
@@ -59,20 +59,47 @@ o	sequência de acertos, mensagens motivacionais que dependem do desempenho, pon
 
 
 3. Registo de Utilização da IA
-Para demonstrares como trabalhaste em parceria com o Copilot, Gemini, Claude,
-Mistral, etc., regista:
-1. Prompt para conversão Web/HTML
-2. Prompt para ampliação e construção de funcionalidades
-3. Dificuldades e erros corrigidos com a IA
-4. Otimização de Layout: O que sugeriste à IA para alterar no design - cores,
-margens, fontes, botões?
+Prompt 1 (Google Gemini) - Tens QI 300 e és o maior especialista em multimédia do mundo. Analisa os ficheiros Python existentes e CSS que desenvolvi.
+Pretendo transformar o meu programa de jogo QUIZ numa aplicação web funcional.
+Requisitos:
+•	Preservar a lógica do jogo QUIZ já desenvolvida.
+•	Permitir a introdução de texto através da interface web.
+•	Executar o processamento através de Python.
+•	Apresentar o jogo QUIZ gerado na página HTML.
+•	Aplicar o CSS criado anteriormente.
+•	Manter os ficheiros organizados em pastas próprias.
+Analisa primeiro o código existente. Não substituas desnecessariamente funcionalidades já implementadas.
+Apresenta todos os ficheiros completos e indica as alterações efetuadas, as dependências necessárias e os passos para executar a aplicação.
+
+Prompt 2 (Google Gemini) - Analisa agora os ficheiros Python existentes e CSS que desenvolvi.
+Pretendo transformar o meu programa de geração de nuvens de palavras numa aplicação web funcional.
+Requisitos:
+•	Preservar a lógica de geração de nuvens de palavras já desenvolvida.
+•	Permitir a introdução de texto através da interface web.
+•	Executar o processamento através de Python.
+•	Apresentar a nuvem de palavras gerada na página HTML.
+•	Aplicar o CSS criado anteriormente.
+•	Manter os ficheiros organizados em pastas próprias.
+Analisa primeiro o código existente. Não substituas desnecessariamente funcionalidades já implementadas.
+Apresenta todos os ficheiros completos e indica as alterações efetuadas, as dependências necessárias e os passos para executar a aplicação.
+
+Prompt 3 (Google Gemini) - Eu toco bateria desde os meus 5 anos. Assim, com base nas minhas fichas de Python, elabora um widget que tivesse a ver com bateria e que tivesse BPM, gerador de groses e uma bateria interativa. Transforma esse programa numa aplicação web funcional.
+Requisitos:
+•	Executar o processamento através de Python.
+•	Apresentar o widget gerado na página HTML.
+
+Prompt 4 (Claude) - Tens QI 300 e és o maior especialista em multimédia do mundo. Analisa os ficheiros. Diz-me o que posso melhorar, por exemplo, o layout, o fundo da página web com as aplicações (sou um rapaz do 12.º ano) Junta ainda os ficheiros para ficar o código todo na mesma página com os 3 widgets.
+
+Dificuldades e erros corrigidos com a IA: a IA ajudou-me com a normalização de respostas (acentos, maiúsculas e espaços) e também com o ajuste da lógica em Python para manter a correspondência com os widgets.
+
+Otimização de Layout: Sugeri cores personalizadas nas partes que constituem a bateria e mudei o fundo da página web para um fundo mais apelativo e futurista.
 
 4. Estrutura de Ficheiros do Repositório
 Listagem simples dos ficheiros presentes na pasta:
-   1. index.html – página principal do Dashboard / Web App
-   2. style.css (Se necessário) - Folha de estilos para o layout Web
+   1. index.html – página principal do Dashboard / Web App.
+   2. app.py - código python relativo aos widgets
    3. README.md - Este relatório de projeto.
-   4. Assets - Imagens, nuvens de palavras geradas, recursos utilizados, etc.
+   4. Assets - nuvens de palavras gerada.
 
 5. Reflexão Crítica e Aprendizagem
 O que correu melhor neste projeto foi transformar a minha experiência de baterista num widget. Ver o sequenciador a tocar e a bateria a acender foi o ponto mais motivante. Também gostei de ver as fichas de Python a ganhar vida numa página web. A maior dificuldade foi adaptar a lógica de Python para JavaScript e perceber o código que a IA escrevia, sobretudo o áudio, que é gerado por código, e os erros que só apareciam quando eu testava (por exemplo, o som do bombo da bateria que estava, inicialmente, menos grave do que gostaria).A IA mudou profundamente a minha forma de programar. Passei a pedir primeiro uma análise e só depois o código, a testar cada resultado e a pedir correções concretas. A IA acelerou muito o trabalho, mas só funcionou bem quando eu dizia exatamente o que queria com bons prompts, e percebi que tenho de rever sempre o que a IA produz - a IA é, sem dúvida, uma mais-valia quando usada corretamente!
