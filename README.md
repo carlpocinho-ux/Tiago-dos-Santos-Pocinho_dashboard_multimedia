@@ -1,7 +1,7 @@
 # Tiago dos Santos Pocinho_dashboard_multimedia.
 Projeto Multimédia de Programação com Inteligência Artificial
 
-Nome da Aplicação / Dashboard Web: GitHub Pages
+Nome da Aplicação / Dashboard Web: Oficina Multimédia
 Disciplina: Oficina de Multimédia - 12.º ano - CRSI
 Ano Letivo: 2026/2027
 Autor: Tiago dos Santos Pocinho
