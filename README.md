@@ -6,7 +6,7 @@ Disciplina: Oficina de Multimédia - 12.º ano - CRSI
 Ano Letivo: 2026/2027
 Autor: Tiago dos Santos Pocinho
 Turma: A3
-Link da Aplicação Web: 
+Link da Aplicação Web: https://carlpocinho-ux.github.io/Tiago-dos-Santos-Pocinho_dashboard_multimedia/
 
 1. Visão Geral do Projeto
 Descrição: Dashboard web com 3 ferramentas interativas, criadas a partir das minhas fichas de Python e ampliadas com Inteligência Artificial: um analisador semântico de textos com nuvem de palavras, um estúdio de bateria com sequenciador de ritmos e um quiz sobre multimédia e bateria. O projeto junta programação, design de interface e som numa única página.
